@@ -1,9 +1,9 @@
 {
-  "name": "@napi-rs/package-template",
+  "name": "rollup-plugin-local-import",
   "version": "1.0.0",
-  "description": "Template project for writing node package with napi-rs",
+  "description": "Rollup plugin to manipulate local import/export statements",
   "main": "index.js",
-  "repository": "git@github.com:napi-rs/package-template.git",
+  "repository": "https://github.com/AriPerkkio/rollup-plugin-local-import",
   "license": "MIT",
   "keywords": [
     "napi-rs",
@@ -18,7 +18,7 @@
     "index.js"
   ],
   "napi": {
-    "name": "package-template",
+    "name": "rollup-plugin-local-import",
     "triples": {
       "defaults": true,
       "additional": [

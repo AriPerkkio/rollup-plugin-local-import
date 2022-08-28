@@ -114,29 +114,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@napi-rs/package-template@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@napi-rs/package-template@workspace:."
-  dependencies:
-    "@napi-rs/cli": ^2.11.4
-    "@swc-node/register": ^1.5.1
-    "@typescript-eslint/eslint-plugin": ^5.35.1
-    "@typescript-eslint/parser": ^5.35.1
-    ava: ^4.3.3
-    benny: ^3.7.1
-    chalk: ^5.0.1
-    eslint: ^8.23.0
-    eslint-config-prettier: ^8.5.0
-    eslint-plugin-import: ^2.26.0
-    eslint-plugin-prettier: ^4.2.1
-    husky: ^8.0.1
-    lint-staged: ^13.0.3
-    npm-run-all: ^4.1.5
-    prettier: ^2.7.1
-    typescript: ^4.8.2
-  languageName: unknown
-  linkType: soft
-
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -3663,6 +3640,29 @@ __metadata:
   checksum: 87f4164e396f0171b0a3386cc1877a817f572148ee13a7e113b238e48e8a9f2f31d009a92ec38a591ff1567d9662c6b67fd8818a2dbbaed74bc26a87a2a4a9a0
   languageName: node
   linkType: hard
+
+"rollup-plugin-local-import@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "rollup-plugin-local-import@workspace:."
+  dependencies:
+    "@napi-rs/cli": ^2.11.4
+    "@swc-node/register": ^1.5.1
+    "@typescript-eslint/eslint-plugin": ^5.35.1
+    "@typescript-eslint/parser": ^5.35.1
+    ava: ^4.3.3
+    benny: ^3.7.1
+    chalk: ^5.0.1
+    eslint: ^8.23.0
+    eslint-config-prettier: ^8.5.0
+    eslint-plugin-import: ^2.26.0
+    eslint-plugin-prettier: ^4.2.1
+    husky: ^8.0.1
+    lint-staged: ^13.0.3
+    npm-run-all: ^4.1.5
+    prettier: ^2.7.1
+    typescript: ^4.8.2
+  languageName: unknown
+  linkType: soft
 
 "run-parallel@npm:^1.1.9":
   version: 1.2.0
