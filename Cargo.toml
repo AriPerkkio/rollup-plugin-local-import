@@ -1,10 +1,8 @@
 [package]
-authors = ["LongYinan <lynweklm@gmail.com>"]
+authors = ["AriPerkkio <ari.perkkio@gmail.com>"]
 edition = "2021"
 name = "rollup-plugin-local-import"
-version = "0.1.0"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+version = "0.0.1"
 
 [lib]
 crate-type = ["cdylib"]
