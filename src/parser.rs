@@ -11,9 +11,9 @@ use swc_ecma_ast::{EsVersion, ExportAll, ExportDecl, ExportNamedSpecifier};
 use swc_ecma_parser::Syntax;
 use swc_ecma_visit::Fold;
 
-struct Manipulator {}
+struct Visitor {}
 
-impl Fold for Manipulator {
+impl Fold for Visitor {
     fn fold_export_all(&mut self, n: ExportAll) -> ExportAll {
         println!("Visiting ExportAll - {:?}", n);
         return n;
@@ -45,5 +45,5 @@ pub fn parse(code: &str) {
         )
         .unwrap();
 
-    let _trns = comp.transform(&handler, _js, false, Manipulator {});
+    let _trns = comp.transform(&handler, _js, false, Visitor {});
 }
