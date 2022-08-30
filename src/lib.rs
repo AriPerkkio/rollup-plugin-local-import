@@ -2,6 +2,8 @@
 
 use napi_derive::napi;
 
+mod parser;
+
 #[napi(constructor)]
 pub struct Plugin {
     pub name: String,
@@ -16,7 +18,7 @@ pub struct TransformResult {
 impl Plugin {
     #[napi]
     pub fn transform(&self, code: String) -> TransformResult {
-        println!("Transforming {code}");
+        parser::parse(&code);
 
         TransformResult { code }
     }
