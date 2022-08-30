@@ -1,14 +1,12 @@
-const { rollupPluginLocalImport } = require('../index')
+const { localImport } = require('../index')
 
-const plugin = rollupPluginLocalImport();
-
-console.log('Plugin', plugin);
+const plugin = localImport()
 
 const source = `
 export { default } from './first-file';
 export * from './second-file';
-`;
+`
 
-const transformed = plugin.transform(source);
+const transformed = plugin.transform(source)
 
-console.log('transformed', transformed);
+console.log('transformed', transformed)

@@ -218,6 +218,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { rollupPluginLocalImport } = nativeBinding
+const { Plugin, localImport } = nativeBinding
 
-module.exports.rollupPluginLocalImport = rollupPluginLocalImport
+module.exports.Plugin = Plugin
+module.exports.localImport = localImport

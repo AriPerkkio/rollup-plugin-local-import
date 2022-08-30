@@ -2,25 +2,29 @@
 
 use napi_derive::napi;
 
-#[napi(object)]
+#[napi(constructor)]
 pub struct Plugin {
-  pub name: String,
+    pub name: String,
 }
 
-struct TransformResult {
-  code: String
+#[napi(object)]
+pub struct TransformResult {
+    pub code: String,
 }
 
-
+#[napi]
 impl Plugin {
-  fn transform(code: String) -> TransformResult {
-      println!("transforming {code}");
+    #[napi]
+    pub fn transform(&self, code: String) -> TransformResult {
+        println!("Transforming {code}");
 
-      TransformResult { code }
+        TransformResult { code }
     }
 }
 
 #[napi]
-pub fn rollup_plugin_local_import() -> Plugin {
-  Plugin { name: "local-import".to_string() }
+pub fn local_import() -> Plugin {
+    Plugin {
+        name: "local-import".to_string(),
+    }
 }
