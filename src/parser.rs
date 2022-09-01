@@ -1,49 +1,59 @@
 extern crate swc_common;
-extern crate swc_ecma_parser;
 
-use swc::Compiler;
-use swc_common::sync::Lrc;
+use swc::{config::Options, Compiler};
 use swc_common::{
     errors::{ColorConfig, Handler},
-    FileName, SourceMap,
+    sync::Lrc,
+    FileName, SourceMap, DUMMY_SP,
 };
-use swc_ecma_ast::{EsVersion, ExportAll, ExportDecl, ExportNamedSpecifier};
-use swc_ecma_parser::Syntax;
-use swc_ecma_visit::Fold;
 
-struct Visitor {}
+use swc_ecma_ast::{ExportAll, Str};
+use swc_ecma_visit::{as_folder, Fold};
+use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 
-impl Fold for Visitor {
-    fn fold_export_all(&mut self, n: ExportAll) -> ExportAll {
-        println!("Visiting ExportAll - {:?}", n);
-        return n;
-    }
-    fn fold_export_decl(&mut self, n: ExportDecl) -> ExportDecl {
-        println!("Visiting ExportDecl - {:?}", n);
-        return n;
-    }
-    fn fold_export_named_specifier(&mut self, n: ExportNamedSpecifier) -> ExportNamedSpecifier {
-        println!("Visiting ExportNamedSpecifier - {:?}", n);
-        return n;
+struct Visitor;
+impl VisitMut for Visitor {
+    fn visit_mut_export_all(&mut self, node: &mut ExportAll) {
+        println!("Visiting ExportAll - {:?}", node);
+
+        println!("value of src is {:?}", node.src.value);
+
+        *node = ExportAll {
+            span: DUMMY_SP,
+            src: Str {
+                raw: None,
+                span: node.src.span,
+                value: node.src.value.clone(),
+            },
+            asserts: None,
+        }
     }
 }
 
-pub fn parse(code: &str) {
-    let cm: Lrc<SourceMap> = Default::default();
-    let handler = Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(cm.clone()));
-    let fm = cm.new_source_file(FileName::Custom("test.js".into()), code.to_string());
+fn visitor() -> impl Fold {
+    as_folder(Visitor)
+}
 
-    let comp = Compiler::new(cm);
-    let _js = comp
-        .parse_js(
-            fm,
-            &handler,
-            EsVersion::Es2022,
-            Syntax::Es(Default::default()),
-            swc::config::IsModule::Bool(true),
-            None,
-        )
-        .unwrap();
+pub fn parse(code: &str) -> String {
+    let source_map: Lrc<SourceMap> = Default::default();
+    let source_file =
+        source_map.new_source_file(FileName::Custom("source.js".into()), code.to_string());
+    let handler =
+        Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(source_map.clone()));
 
-    let _trns = comp.transform(&handler, _js, false, Visitor {});
+    let compiler = Compiler::new(source_map);
+
+    let transformed = compiler.process_js_with_custom_pass(
+        source_file,
+        None,
+        &handler,
+        &Options::default(),
+        |_, _| visitor(),
+        |_, _| noop(),
+    );
+
+    handler.abort_if_errors();
+
+    // TODO: Include source map
+    transformed.unwrap().code
 }

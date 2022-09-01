@@ -15,6 +15,7 @@ swc_common = { version = "0.27.13", features = ["tty-emitter"] }
 swc_ecma_ast = "0.90.15"
 swc_ecma_parser = "0.118.2"
 swc_ecma_visit = "0.76.6"
+swc_ecmascript = { version = "0.197.0", features = ["visit", "transforms"]}
 
 [build-dependencies]
 napi-build = "2"

@@ -17,10 +17,11 @@ pub struct TransformResult {
 #[napi]
 impl Plugin {
     #[napi]
-    pub fn transform(&self, code: String) -> TransformResult {
-        parser::parse(&code);
+    pub fn transform(&self, source_code: String) -> TransformResult {
+        let transformed = parser::parse(&source_code);
 
-        TransformResult { code }
+        // TODO: Include source map
+        TransformResult { code: transformed }
     }
 }
 
