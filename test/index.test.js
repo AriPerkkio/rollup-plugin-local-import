@@ -1,12 +1,11 @@
-const { localImport } = require('../index')
+import { expect, test } from 'vitest'
+
+import { localImport } from '../index'
 
 const plugin = localImport()
 
-const source = `
-export { default } from './first-file';
-export * from './second-file';
-`
+test('ExportAll', () => {
+  const transformed = plugin.transform('export * from "./second-file";')
 
-const transformed = plugin.transform(source)
-
-console.log('transformed', transformed)
+  expect(transformed.code.trim()).toBe('export * from "./second-file.js";')
+})

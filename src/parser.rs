@@ -4,10 +4,10 @@ use swc::{config::Options, Compiler};
 use swc_common::{
     errors::{ColorConfig, Handler},
     sync::Lrc,
-    FileName, SourceMap, DUMMY_SP,
+    FileName, SourceMap
 };
 
-use swc_ecma_ast::{ExportAll, Str};
+use swc_ecma_ast::{ExportAll};
 use swc_ecma_visit::{as_folder, Fold};
 use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 
@@ -16,17 +16,13 @@ impl VisitMut for Visitor {
     fn visit_mut_export_all(&mut self, node: &mut ExportAll) {
         println!("Visiting ExportAll - {:?}", node);
 
-        println!("value of src is {:?}", node.src.value);
+        let mut path = node.src.value.to_string();
+        println!("Original path is {:?}", path);
 
-        *node = ExportAll {
-            span: DUMMY_SP,
-            src: Str {
-                raw: None,
-                span: node.src.span,
-                value: node.src.value.clone(),
-            },
-            asserts: None,
-        }
+        path.push_str(".js");
+        println!("New path is {:?}", path);
+
+        node.src.value = path.into()
     }
 }
 
