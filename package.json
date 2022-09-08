@@ -35,30 +35,14 @@
     "access": "public"
   },
   "scripts": {
-    "artifacts": "napi artifacts",
-    "build": "napi build --platform --release --pipe \"prettier -w\"",
-    "test": "vitest",
-    "build:debug": "napi build --platform --pipe \"prettier -w\"",
-    "format": "run-p format:prettier format:rs",
-    "format:prettier": "prettier . -w",
-    "format:rs": "cargo fmt",
-    "prepublishOnly": "napi prepublish -t npm",
-    "version": "napi version"
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "test": "vitest"
   },
   "devDependencies": {
     "@napi-rs/cli": "^2.11.4",
-    "@swc-node/register": "^1.5.1",
-    "chalk": "^5.0.1",
-    "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
     "rollup": "^2.78.1",
     "vitest": "^0.23.0"
-  },
-  "prettier": {
-    "printWidth": 120,
-    "semi": false,
-    "trailingComma": "all",
-    "singleQuote": true,
-    "arrowParens": "always"
   }
 }
