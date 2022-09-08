@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Todo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Todo
+        run: echo todo
