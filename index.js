@@ -23,39 +23,7 @@ function isMusl() {
 
 switch (platform) {
   case "android":
-    switch (arch) {
-      case "arm64":
-        localFileExisted = existsSync(
-          join(__dirname, "rollup-plugin-local-import.android-arm64.node")
-        );
-        try {
-          if (localFileExisted) {
-            nativeBinding = require("./rollup-plugin-local-import.android-arm64.node");
-          } else {
-            nativeBinding = require("rollup-plugin-local-import-android-arm64");
-          }
-        } catch (e) {
-          loadError = e;
-        }
-        break;
-      case "arm":
-        localFileExisted = existsSync(
-          join(__dirname, "rollup-plugin-local-import.android-arm-eabi.node")
-        );
-        try {
-          if (localFileExisted) {
-            nativeBinding = require("./rollup-plugin-local-import.android-arm-eabi.node");
-          } else {
-            nativeBinding = require("rollup-plugin-local-import-android-arm-eabi");
-          }
-        } catch (e) {
-          loadError = e;
-        }
-        break;
-      default:
-        throw new Error(`Unsupported architecture on Android ${arch}`);
-    }
-    break;
+    throw new Error("Unsupported architecture on Android");
   case "win32":
     switch (arch) {
       case "x64":
@@ -139,22 +107,7 @@ switch (platform) {
     }
     break;
   case "freebsd":
-    if (arch !== "x64") {
-      throw new Error(`Unsupported architecture on FreeBSD: ${arch}`);
-    }
-    localFileExisted = existsSync(
-      join(__dirname, "rollup-plugin-local-import.freebsd-x64.node")
-    );
-    try {
-      if (localFileExisted) {
-        nativeBinding = require("./rollup-plugin-local-import.freebsd-x64.node");
-      } else {
-        nativeBinding = require("rollup-plugin-local-import-freebsd-x64");
-      }
-    } catch (e) {
-      loadError = e;
-    }
-    break;
+    throw new Error("Unsupported architecture on FreeBSD");
   case "linux":
     switch (arch) {
       case "x64":
