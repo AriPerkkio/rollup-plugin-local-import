@@ -4,10 +4,10 @@ use swc::{config::Options, Compiler};
 use swc_common::{
     errors::{ColorConfig, Handler},
     sync::Lrc,
-    FileName, SourceMap
+    FileName, SourceMap,
 };
 
-use swc_ecma_ast::{ExportAll};
+use swc_ecma_ast::ExportAll;
 use swc_ecma_visit::{as_folder, Fold};
 use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 
@@ -15,9 +15,11 @@ struct Visitor;
 impl VisitMut for Visitor {
     fn visit_mut_export_all(&mut self, node: &mut ExportAll) {
         let mut path = node.src.value.to_string();
-        path.push_str(".js");
 
-        node.src.value = path.into()
+        if path.starts_with("./") || path.starts_with("../") {
+            path.push_str(".js");
+            node.src.value = path.into()
+        }
     }
 }
 
@@ -47,4 +49,36 @@ pub fn parse(code: &str) -> String {
 
     // TODO: Include source map
     transformed.unwrap().code
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn export_all_local_file_in_same_directory() {
+        let source_code = "export * from \"./local-file\";";
+
+        let transformed = parse(source_code);
+
+        assert_eq!(transformed.trim(), "export * from \"./local-file.js\";");
+    }
+
+    #[test]
+    fn export_all_local_file_in_parent_directory() {
+        let source_code = "export * from \"../local-file\";";
+
+        let transformed = parse(source_code);
+
+        assert_eq!(transformed.trim(), "export * from \"../local-file.js\";");
+    }
+
+    #[test]
+    fn export_all_dependency() {
+        let source_code = "export * from \"some-dependency\";";
+
+        let transformed = parse(source_code);
+
+        assert_eq!(transformed.trim(), source_code);
+    }
 }
