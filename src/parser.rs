@@ -14,13 +14,8 @@ use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 struct Visitor;
 impl VisitMut for Visitor {
     fn visit_mut_export_all(&mut self, node: &mut ExportAll) {
-        println!("Visiting ExportAll - {:?}", node);
-
         let mut path = node.src.value.to_string();
-        println!("Original path is {:?}", path);
-
         path.push_str(".js");
-        println!("New path is {:?}", path);
 
         node.src.value = path.into()
     }
