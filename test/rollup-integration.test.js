@@ -2,9 +2,7 @@ import { rmSync, writeFileSync } from "fs";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { rollup } from "rollup";
 
-import { localImport } from "../index";
-
-const plugin = localImport();
+import localImport from "../index";
 
 const input = "input.js";
 const output = { file: "output.js" };
@@ -28,14 +26,7 @@ test("rollup", async () => {
   const build = await rollup({
     input,
     external: () => true,
-    plugins: [
-      // TODO: Rollup tries to serialize plugin.
-      // Figure out why `plugins: [localImport()]` fails to serialize.
-      {
-        name: plugin.name,
-        transform: (...args) => plugin.transform(...args),
-      },
-    ],
+    plugins: [localImport],
   });
 
   const bundle = await build.write({ output });

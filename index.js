@@ -197,7 +197,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`);
 }
 
-const { Plugin, localImport } = nativeBinding;
+const { name, transform } = nativeBinding;
 
-module.exports.Plugin = Plugin;
-module.exports.localImport = localImport;
+module.exports.name = name;
+module.exports.transform = transform;
