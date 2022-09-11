@@ -11,6 +11,11 @@ const source = `
 export * from "./local-file";
 export * from "../file-from-parent-directory";
 export * from 'some-dependency';
+
+// ExportNamedDeclaration
+export { a } from "./local-file";
+export { b } from "../file-from-parent-directory";
+export { c } from 'some-dependency';
 `.trim();
 
 beforeAll(() => {
@@ -34,7 +39,10 @@ test("rollup", async () => {
   expect(bundle.output).toHaveLength(1);
   expect(bundle.output[0].code.trim()).toMatchInlineSnapshot(`
     "export * from './local-file.js';
+    export { a } from './local-file.js';
     export * from '../file-from-parent-directory.js';
-    export * from 'some-dependency';"
+    export { b } from '../file-from-parent-directory.js';
+    export * from 'some-dependency';
+    export { c } from 'some-dependency';"
   `);
 });

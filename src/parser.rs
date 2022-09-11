@@ -7,7 +7,7 @@ use swc_common::{
     FileName, SourceMap,
 };
 
-use swc_ecma_ast::ExportAll;
+use swc_ecma_ast::{ExportAll, NamedExport};
 use swc_ecma_visit::{as_folder, Fold};
 use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 
@@ -19,6 +19,15 @@ impl VisitMut for Visitor {
         if path.starts_with("./") || path.starts_with("../") {
             path.push_str(".js");
             node.src.value = path.into()
+        }
+    }
+
+    fn visit_mut_named_export(&mut self, node: &mut NamedExport) {
+        let mut path = node.src.as_ref().unwrap().value.to_string();
+
+        if path.starts_with("./") || path.starts_with("../") {
+            path.push_str(".js");
+            node.src.as_mut().unwrap().value = path.into()
         }
     }
 }
@@ -80,5 +89,17 @@ mod tests {
         let transformed = parse(source_code);
 
         assert_eq!(transformed.trim(), source_code);
+    }
+
+    #[test]
+    fn export_named_local_file_in_same_directory() {
+        let source_code = "export { method } from \"./local-file\";";
+
+        let transformed = parse(source_code);
+
+        assert_eq!(
+            transformed.trim(),
+            "export { method } from \"./local-file.js\";"
+        );
     }
 }
