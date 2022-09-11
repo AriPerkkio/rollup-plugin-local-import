@@ -102,4 +102,25 @@ mod tests {
             "export { method } from \"./local-file.js\";"
         );
     }
+
+    #[test]
+    fn export_named_local_file_in_parent_directory() {
+        let source_code = "export { method } from \"../local-file\";";
+
+        let transformed = parse(source_code);
+
+        assert_eq!(
+            transformed.trim(),
+            "export { method } from \"../local-file.js\";"
+        );
+    }
+
+    #[test]
+    fn export_named_dependency() {
+        let source_code = "export { method } from \"some-dependency\";";
+
+        let transformed = parse(source_code);
+
+        assert_eq!(transformed.trim(), source_code);
+    }
 }
