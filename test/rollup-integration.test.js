@@ -2,7 +2,7 @@ import { rmSync, writeFileSync } from "fs";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { rollup } from "rollup";
 
-import localImport from "../index";
+const localImport = require("../index.node");
 
 const input = "input.js";
 const output = { file: "output.js" };

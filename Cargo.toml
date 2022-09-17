@@ -1,0 +1,22 @@
+[package]
+authors = ["AriPerkkio <ari.perkkio@gmail.com>"]
+edition = "2021"
+name = "rollup-plugin-local-import"
+version = "0.0.1"
+license = "MIT"
+exclude = ["index.node"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+swc = "0.221.1"
+swc_common = { version = "0.27.13", features = ["tty-emitter"] }
+swc_ecma_ast = "0.90.15"
+swc_ecma_visit = "0.76.6"
+swc_ecmascript = { version = "0.197.0", features = ["visit", "transforms"]}
+
+[dependencies.neon]
+version = "0.10"
+default-features = false
+features = ["napi-6"]
