@@ -2,7 +2,7 @@ import { rmSync, writeFileSync } from "fs";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { rollup } from "rollup";
 
-const localImport = require("../index.node");
+import localImport from "../index";
 
 const input = "input.js";
 const output = { file: "output.js" };
@@ -31,7 +31,7 @@ test("rollup", async () => {
   const build = await rollup({
     input,
     external: () => true,
-    plugins: [localImport],
+    plugins: [localImport({ extension: ".js" })],
   });
 
   const bundle = await build.write({ output });
@@ -45,4 +45,11 @@ test("rollup", async () => {
     export * from 'some-dependency';
     export { c } from 'some-dependency';"
   `);
+});
+
+test("plugin has name", () => {
+  expect(localImport({ extension: ".js" })).toHaveProperty(
+    "name",
+    "local-import"
+  );
 });
