@@ -2,6 +2,7 @@
   "name": "rollup-plugin-local-import",
   "version": "0.0.1",
   "description": "Rollup plugin to manipulate local import/export statements",
+  "main": "index.node",
   "repository": "https://github.com/AriPerkkio/rollup-plugin-local-import",
   "license": "MIT",
   "files": [
@@ -13,9 +14,14 @@
     "access": "public"
   },
   "scripts": {
+    "build": "cargo-cp-artifact -nc index.node -- cargo build --message-format=json-render-diagnostics",
+    "build-debug": "npm run build --",
+    "build-release": "npm run build -- --release",
+    "install": "npm run build-release",
     "test": "vitest"
   },
   "devDependencies": {
+    "cargo-cp-artifact": "^0.1",
     "prettier": "^2.7.1",
     "rollup": "^2.78.1",
     "vitest": "^0.23.1"
