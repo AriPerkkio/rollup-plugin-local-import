@@ -11,13 +11,16 @@ use swc_ecma_ast::{ExportAll, NamedExport};
 use swc_ecma_visit::{as_folder, Fold};
 use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 
-struct Visitor;
+struct Visitor {
+    extension: String,
+}
+
 impl VisitMut for Visitor {
     fn visit_mut_export_all(&mut self, node: &mut ExportAll) {
         let mut path = node.src.value.to_string();
 
         if path.starts_with("./") || path.starts_with("../") {
-            path.push_str(".js");
+            path.push_str(&self.extension);
             node.src.value = path.into()
         }
     }
@@ -26,17 +29,17 @@ impl VisitMut for Visitor {
         let mut path = node.src.as_ref().unwrap().value.to_string();
 
         if path.starts_with("./") || path.starts_with("../") {
-            path.push_str(".js");
+            path.push_str(&self.extension);
             node.src.as_mut().unwrap().value = path.into()
         }
     }
 }
 
-fn visitor() -> impl Fold {
-    as_folder(Visitor)
+fn visitor(extension: String) -> impl Fold {
+    as_folder(Visitor { extension })
 }
 
-pub fn parse(code: &str) -> String {
+pub fn parse(code: &str, extension: &str) -> String {
     let source_map: Lrc<SourceMap> = Default::default();
     let source_file =
         source_map.new_source_file(FileName::Custom("source.js".into()), code.to_string());
@@ -50,7 +53,7 @@ pub fn parse(code: &str) -> String {
         None,
         &handler,
         &Options::default(),
-        |_, _| visitor(),
+        |_, _| visitor(String::from(extension)),
         |_, _| noop(),
     );
 
@@ -68,7 +71,7 @@ mod tests {
     fn export_all_local_file_in_same_directory() {
         let source_code = "export * from \"./local-file\";";
 
-        let transformed = parse(source_code);
+        let transformed = parse(source_code, ".js");
 
         assert_eq!(transformed.trim(), "export * from \"./local-file.js\";");
     }
@@ -77,7 +80,7 @@ mod tests {
     fn export_all_local_file_in_parent_directory() {
         let source_code = "export * from \"../local-file\";";
 
-        let transformed = parse(source_code);
+        let transformed = parse(source_code, ".js");
 
         assert_eq!(transformed.trim(), "export * from \"../local-file.js\";");
     }
@@ -86,7 +89,7 @@ mod tests {
     fn export_all_dependency() {
         let source_code = "export * from \"some-dependency\";";
 
-        let transformed = parse(source_code);
+        let transformed = parse(source_code, ".js");
 
         assert_eq!(transformed.trim(), source_code);
     }
@@ -95,7 +98,7 @@ mod tests {
     fn export_named_local_file_in_same_directory() {
         let source_code = "export { method } from \"./local-file\";";
 
-        let transformed = parse(source_code);
+        let transformed = parse(source_code, ".js");
 
         assert_eq!(
             transformed.trim(),
@@ -107,7 +110,7 @@ mod tests {
     fn export_named_local_file_in_parent_directory() {
         let source_code = "export { method } from \"../local-file\";";
 
-        let transformed = parse(source_code);
+        let transformed = parse(source_code, ".js");
 
         assert_eq!(
             transformed.trim(),
@@ -119,7 +122,7 @@ mod tests {
     fn export_named_dependency() {
         let source_code = "export { method } from \"some-dependency\";";
 
-        let transformed = parse(source_code);
+        let transformed = parse(source_code, ".js");
 
         assert_eq!(transformed.trim(), source_code);
     }

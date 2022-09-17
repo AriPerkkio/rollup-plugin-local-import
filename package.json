@@ -2,13 +2,16 @@
   "name": "rollup-plugin-local-import",
   "version": "0.0.1",
   "description": "Rollup plugin to manipulate local import/export statements",
-  "main": "index.node",
+  "type": "module",
   "repository": "https://github.com/AriPerkkio/rollup-plugin-local-import",
   "license": "MIT",
   "files": [
+    "index.mjs",
     "index.d.ts",
-    "index.js"
+    "index.node"
   ],
+  "exports": "./index.mjs",
+  "types": "index.d.ts",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"

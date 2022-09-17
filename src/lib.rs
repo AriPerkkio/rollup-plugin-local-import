@@ -19,8 +19,10 @@ impl TransformResult {
 }
 
 fn transform(mut cx: FunctionContext) -> JsResult<JsObject> {
-    let source_code = cx.argument::<JsString>(0)?;
-    let transformed = parser::parse(&source_code.value(&mut cx));
+    let extension = cx.argument::<JsString>(0)?;
+    let source_code = cx.argument::<JsString>(1)?;
+
+    let transformed = parser::parse(&source_code.value(&mut cx), &extension.value(&mut cx));
 
     // TODO: Include source map
     let result = TransformResult { code: transformed };
