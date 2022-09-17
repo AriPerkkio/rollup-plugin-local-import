@@ -2,42 +2,20 @@
   "name": "rollup-plugin-local-import",
   "version": "0.0.1",
   "description": "Rollup plugin to manipulate local import/export statements",
-  "main": "index.js",
   "repository": "https://github.com/AriPerkkio/rollup-plugin-local-import",
   "license": "MIT",
   "files": [
     "index.d.ts",
     "index.js"
   ],
-  "napi": {
-    "name": "rollup-plugin-local-import",
-    "triples": {
-      "defaults": true,
-      "additional": [
-        "x86_64-unknown-linux-musl",
-        "aarch64-unknown-linux-gnu",
-        "i686-pc-windows-msvc",
-        "armv7-unknown-linux-gnueabihf",
-        "aarch64-apple-darwin",
-        "aarch64-unknown-linux-musl",
-        "aarch64-pc-windows-msvc"
-      ]
-    }
-  },
-  "engines": {
-    "node": ">= 10"
-  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
   "scripts": {
-    "build": "napi build --platform --release",
-    "build:debug": "napi build --platform",
     "test": "vitest"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^2.11.4",
     "prettier": "^2.7.1",
     "rollup": "^2.78.1",
     "vitest": "^0.23.1"
