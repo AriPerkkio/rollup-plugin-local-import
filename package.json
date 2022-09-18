@@ -23,7 +23,7 @@
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
-    "test": "vitest",
+    "test": "vitest run",
     "version": "napi version"
   },
   "devDependencies": {
