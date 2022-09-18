@@ -8,8 +8,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-lint:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Todo
-        run: echo Todo
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Install & Build
+        run: |
+          yarn install
+          yarn build
+
+      - name: Test
+        run: yarn test
