@@ -6,6 +6,12 @@
   "license": "MIT",
   "main": "plugin.js",
   "types": "plugin.d.ts",
+  "files": [
+    "index.d.ts",
+    "index.js",
+    "plugin.js",
+    "plugin.d.ts"
+  ],
   "engines": {
     "node": ">= 10"
   },
