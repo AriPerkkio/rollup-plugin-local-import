@@ -7,7 +7,7 @@ use swc_common::{
     FileName, SourceMap,
 };
 
-use swc_ecma_ast::{ExportAll, NamedExport};
+use swc_ecma_ast::{ExportAll, ImportDecl, NamedExport};
 use swc_ecma_visit::{as_folder, Fold};
 use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 
@@ -19,7 +19,7 @@ impl VisitMut for Visitor {
     fn visit_mut_export_all(&mut self, node: &mut ExportAll) {
         let mut path = node.src.value.to_string();
 
-        if path.starts_with("./") || path.starts_with("../") {
+        if is_local_import(&path) {
             path.push_str(&self.extension);
             node.src.value = path.into()
         }
@@ -28,11 +28,24 @@ impl VisitMut for Visitor {
     fn visit_mut_named_export(&mut self, node: &mut NamedExport) {
         let mut path = node.src.as_ref().unwrap().value.to_string();
 
-        if path.starts_with("./") || path.starts_with("../") {
+        if is_local_import(&path) {
             path.push_str(&self.extension);
             node.src.as_mut().unwrap().value = path.into()
         }
     }
+
+    fn visit_mut_import_decl(&mut self, node: &mut ImportDecl) {
+        let mut path = node.src.value.to_string();
+
+        if is_local_import(&path) {
+            path.push_str(&self.extension);
+            node.src.value = path.into()
+        }
+    }
+}
+
+fn is_local_import(path: &str) -> bool {
+    return path.starts_with("./") || path.starts_with("../");
 }
 
 fn visitor(extension: String) -> impl Fold {

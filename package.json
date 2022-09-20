@@ -30,6 +30,7 @@
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
     "test": "vitest run",
+    "test:watch": "vitest",
     "version": "napi version"
   },
   "devDependencies": {

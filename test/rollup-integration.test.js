@@ -6,28 +6,100 @@ import { localImport } from "../plugin";
 
 const input = "input.js";
 const output = { file: "output.js" };
-const source = `
-// ExportAllDeclaration
-export * from "./local-file";
-export * from "../file-from-parent-directory";
-export * from 'some-dependency';
-
-// ExportNamedDeclaration
-export { a } from "./local-file";
-export { b } from "../file-from-parent-directory";
-export { c } from 'some-dependency';
-`.trim();
-
-beforeAll(() => {
-  writeFileSync(input, source, "utf-8");
-});
 
 afterAll(() => {
   rmSync(input);
   rmSync(output.file);
 });
 
-test("rollup", async () => {
+test("ExportAllDeclaration", async () => {
+  const output = await run(`
+    export * from "./local-file";
+    export * from "../file-from-parent-directory";
+    export * from 'some-dependency';
+  `);
+
+  expect(output).toMatchInlineSnapshot(`
+    "export * from './local-file.js';
+    export * from '../file-from-parent-directory.js';
+    export * from 'some-dependency';
+    "
+  `);
+});
+
+test("ExportNamedDeclaration", async () => {
+  const output = await run(`
+    export { a } from "./local-file";
+    export { b } from "../file-from-parent-directory";
+    export { c } from 'some-dependency';
+  `);
+
+  expect(output).toMatchInlineSnapshot(`
+    "export { a } from './local-file.js';
+    export { b } from '../file-from-parent-directory.js';
+    export { c } from 'some-dependency';
+    "
+  `);
+});
+
+test("ImportDeclaration, default", async () => {
+  const output = await run(`
+    import a from "./local-file";
+    import b from "../file-from-parent-directory";
+    import c from 'some-dependency';
+    console.log(a,b,c);
+  `);
+
+  expect(output).toMatchInlineSnapshot(`
+    "import a from './local-file.js';
+    import b from '../file-from-parent-directory.js';
+    import c from 'some-dependency';
+
+    console.log(a, b, c);
+    "
+  `);
+});
+
+test("ImportDeclaration, named", async () => {
+  const output = await run(`
+    import { a } from "./local-file";
+    import { b } from "../file-from-parent-directory";
+    import { c } from 'some-dependency';
+    console.log(a,b,c);
+  `);
+
+  expect(output).toMatchInlineSnapshot(`
+    "import { a } from './local-file.js';
+    import { b } from '../file-from-parent-directory.js';
+    import { c } from 'some-dependency';
+
+    console.log(a, b, c);
+    "
+  `);
+});
+
+test("ImportDeclaration, side-effect", async () => {
+  const output = await run(`
+    import "./local-file";
+    import "../file-from-parent-directory";
+    import 'some-dependency';
+  `);
+
+  expect(output).toMatchInlineSnapshot(`
+    "import './local-file.js';
+    import '../file-from-parent-directory.js';
+    import 'some-dependency';
+    "
+  `);
+});
+
+test("plugin has name", () => {
+  expect(localImport(".js")).toHaveProperty("name", "local-import");
+});
+
+async function run(source) {
+  writeFileSync(input, source.trim(), "utf-8");
+
   const build = await rollup({
     input,
     external: () => true,
@@ -36,17 +108,5 @@ test("rollup", async () => {
 
   const bundle = await build.write({ output });
 
-  expect(bundle.output).toHaveLength(1);
-  expect(bundle.output[0].code.trim()).toMatchInlineSnapshot(`
-    "export * from './local-file.js';
-    export { a } from './local-file.js';
-    export * from '../file-from-parent-directory.js';
-    export { b } from '../file-from-parent-directory.js';
-    export * from 'some-dependency';
-    export { c } from 'some-dependency';"
-  `);
-});
-
-test("plugin has name", () => {
-  expect(localImport(".js")).toHaveProperty("name", "local-import");
-});
+  return bundle.output[0].code;
+}
