@@ -11,35 +11,37 @@ use swc_ecma_ast::{ExportAll, ImportDecl, NamedExport};
 use swc_ecma_visit::{as_folder, Fold};
 use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 
+type Callback = Box<dyn Fn(String) -> String>;
+
 struct Visitor {
-    extension: String,
+    callback: Callback,
 }
 
 impl VisitMut for Visitor {
     fn visit_mut_export_all(&mut self, node: &mut ExportAll) {
-        let mut path = node.src.value.to_string();
+        let path = node.src.value.to_string();
 
         if is_local_import(&path) {
-            path.push_str(&self.extension);
-            node.src.value = path.into()
+            let new_path = (&self.callback)(path);
+            node.src.value = new_path.into()
         }
     }
 
     fn visit_mut_named_export(&mut self, node: &mut NamedExport) {
-        let mut path = node.src.as_ref().unwrap().value.to_string();
+        let path = node.src.as_ref().unwrap().value.to_string();
 
         if is_local_import(&path) {
-            path.push_str(&self.extension);
-            node.src.as_mut().unwrap().value = path.into()
+            let new_path = (&self.callback)(path);
+            node.src.as_mut().unwrap().value = new_path.into()
         }
     }
 
     fn visit_mut_import_decl(&mut self, node: &mut ImportDecl) {
-        let mut path = node.src.value.to_string();
+        let path = node.src.value.to_string();
 
         if is_local_import(&path) {
-            path.push_str(&self.extension);
-            node.src.value = path.into()
+            let new_path = (&self.callback)(path);
+            node.src.value = new_path.into()
         }
     }
 }
@@ -48,11 +50,11 @@ fn is_local_import(path: &str) -> bool {
     return path.starts_with("./") || path.starts_with("../");
 }
 
-fn visitor(extension: String) -> impl Fold {
-    as_folder(Visitor { extension })
+fn visitor(callback: Callback) -> impl Fold {
+    as_folder(Visitor { callback })
 }
 
-pub fn parse(code: &str, extension: &str) -> String {
+pub fn parse(code: &str, callback: Callback) -> String {
     let source_map: Lrc<SourceMap> = Default::default();
     let source_file =
         source_map.new_source_file(FileName::Custom("source.js".into()), code.to_string());
@@ -66,7 +68,7 @@ pub fn parse(code: &str, extension: &str) -> String {
         None,
         &handler,
         &Options::default(),
-        |_, _| visitor(String::from(extension)),
+        |_, _| visitor(callback),
         |_, _| noop(),
     );
 
@@ -80,11 +82,31 @@ pub fn parse(code: &str, extension: &str) -> String {
 mod tests {
     use super::*;
 
+    fn add_js_extension_callback() -> Callback {
+        Box::new(|path: String| {
+            let mut new_path: String = path.to_string();
+            new_path.push_str(".js");
+
+            new_path
+        })
+    }
+
+    #[test]
+    fn calls_callback_with_path() {
+        parse(
+            "export * from \"./local-file\";",
+            Box::new(|path: String| {
+                assert_eq!(path, "./local-file");
+                path
+            }),
+        );
+    }
+
     #[test]
     fn export_all_local_file_in_same_directory() {
         let source_code = "export * from \"./local-file\";";
 
-        let transformed = parse(source_code, ".js");
+        let transformed = parse(source_code, add_js_extension_callback());
 
         assert_eq!(transformed.trim(), "export * from \"./local-file.js\";");
     }
@@ -93,7 +115,7 @@ mod tests {
     fn export_all_local_file_in_parent_directory() {
         let source_code = "export * from \"../local-file\";";
 
-        let transformed = parse(source_code, ".js");
+        let transformed = parse(source_code, add_js_extension_callback());
 
         assert_eq!(transformed.trim(), "export * from \"../local-file.js\";");
     }
@@ -102,7 +124,7 @@ mod tests {
     fn export_all_dependency() {
         let source_code = "export * from \"some-dependency\";";
 
-        let transformed = parse(source_code, ".js");
+        let transformed = parse(source_code, add_js_extension_callback());
 
         assert_eq!(transformed.trim(), source_code);
     }
@@ -111,7 +133,7 @@ mod tests {
     fn export_named_local_file_in_same_directory() {
         let source_code = "export { method } from \"./local-file\";";
 
-        let transformed = parse(source_code, ".js");
+        let transformed = parse(source_code, add_js_extension_callback());
 
         assert_eq!(
             transformed.trim(),
@@ -123,7 +145,7 @@ mod tests {
     fn export_named_local_file_in_parent_directory() {
         let source_code = "export { method } from \"../local-file\";";
 
-        let transformed = parse(source_code, ".js");
+        let transformed = parse(source_code, add_js_extension_callback());
 
         assert_eq!(
             transformed.trim(),
@@ -135,7 +157,7 @@ mod tests {
     fn export_named_dependency() {
         let source_code = "export { method } from \"some-dependency\";";
 
-        let transformed = parse(source_code, ".js");
+        let transformed = parse(source_code, add_js_extension_callback());
 
         assert_eq!(transformed.trim(), source_code);
     }

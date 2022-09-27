@@ -10,14 +10,24 @@ pub struct TransformResult {
 #[napi]
 pub struct Plugin {
     pub name: String,
-    pub extension: String,
+    extension: String,
 }
 
 #[napi]
 impl Plugin {
     #[napi]
     pub fn transform(&self, source_code: String) -> TransformResult {
-        let transformed = parser::parse(&source_code, &self.extension);
+        // Oh no, don't look here
+        let extension: &'static str = Box::leak(self.extension.to_string().into_boxed_str());
+
+        let callback = Box::new(|path: String| {
+            let mut new_path = path;
+            new_path.push_str(extension);
+
+            new_path
+        });
+
+        let transformed = parser::parse(&source_code, callback);
 
         // TODO: Include source map
         TransformResult { code: transformed }
