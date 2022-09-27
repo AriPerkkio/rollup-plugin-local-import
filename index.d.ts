@@ -9,6 +9,5 @@ export interface TransformResult {
 export function localImport(extension: string): Plugin
 export class Plugin {
   name: string
-  extension: string
   transform(sourceCode: string): TransformResult
 }
