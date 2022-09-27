@@ -8,6 +8,7 @@ function callContextBindHack(...args) {
   return {
     name: plugin.name,
     transform: plugin.transform.bind(plugin),
+    buildEnd: plugin.buildEnd.bind(plugin),
   };
 }
 
