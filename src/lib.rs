@@ -1,5 +1,4 @@
-use std::mem;
-
+use napi::{Env, JsFunction, JsString, Ref};
 use napi_derive::napi;
 
 mod parser;
@@ -12,35 +11,45 @@ pub struct TransformResult {
 #[napi]
 pub struct Plugin {
     pub name: String,
-    extension: String,
+    callback: Ref<()>,
 }
 
 #[napi]
 impl Plugin {
     #[napi]
-    pub fn transform(&self, source_code: String) -> TransformResult {
-        // Oh no, don't look here
-        let extension: &'static str = Box::leak(self.extension.to_string().into_boxed_str());
+    pub fn transform(&self, env: Env, source_code: String) -> TransformResult {
+        let callback: JsFunction = env.get_reference_value(&self.callback).unwrap();
 
-        let callback = Box::new(|path: String| {
-            let mut new_path = path;
-            new_path.push_str(extension);
+        let transform_paths = Box::new(move |path: String| {
+            let args: [JsString; 1] = [env.create_string(&path).unwrap()];
 
-            new_path
+            let modified = callback
+                .call(None, &args)
+                .unwrap()
+                .coerce_to_string()
+                .unwrap()
+                .into_utf8()
+                .unwrap();
+
+            return modified.as_str().unwrap().to_string();
         });
 
-        let transformed = parser::parse(&source_code, callback);
-        mem::forget(extension);
+        let transformed = parser::parse(&source_code, transform_paths);
 
         // TODO: Include source map
         TransformResult { code: transformed }
     }
+
+    #[napi]
+    pub fn build_end(&mut self, env: Env) {
+        self.callback.unref(env).unwrap();
+    }
 }
 
-#[napi]
-pub fn local_import(extension: String) -> Plugin {
+#[napi(ts_args_type = "callback: (path: string) => string")]
+pub fn local_import(env: Env, callback: JsFunction) -> Plugin {
     Plugin {
         name: String::from("local-import"),
-        extension,
+        callback: env.create_reference(callback).unwrap(),
     }
 }

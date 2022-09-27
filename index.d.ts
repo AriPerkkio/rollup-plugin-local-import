@@ -6,8 +6,9 @@
 export interface TransformResult {
   code: string
 }
-export function localImport(extension: string): Plugin
+export function localImport(callback: (path: string) => string): Plugin
 export class Plugin {
   name: string
   transform(sourceCode: string): TransformResult
+  buildEnd(): void
 }

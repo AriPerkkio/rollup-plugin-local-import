@@ -1,5 +1,5 @@
 import { rmSync, writeFileSync } from "fs";
-import { afterAll, beforeAll, expect, test } from "vitest";
+import { afterAll, expect, test } from "vitest";
 import { rollup } from "rollup";
 
 import { localImport } from "../plugin";
@@ -94,7 +94,12 @@ test("ImportDeclaration, side-effect", async () => {
 });
 
 test("plugin has name", () => {
-  expect(localImport(".js")).toHaveProperty("name", "local-import");
+  const plugin = localImport(() => {});
+
+  expect(plugin).toHaveProperty("name", "local-import");
+
+  // Manual cleanup
+  plugin.buildEnd();
 });
 
 async function run(source) {
@@ -103,7 +108,11 @@ async function run(source) {
   const build = await rollup({
     input,
     external: () => true,
-    plugins: [localImport(".js")],
+    plugins: [
+      localImport((path) => {
+        return `${path}.js`;
+      }),
+    ],
   });
 
   const bundle = await build.write({ output });
