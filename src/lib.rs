@@ -1,3 +1,5 @@
+use std::mem;
+
 use napi_derive::napi;
 
 mod parser;
@@ -28,6 +30,7 @@ impl Plugin {
         });
 
         let transformed = parser::parse(&source_code, callback);
+        mem::forget(extension);
 
         // TODO: Include source map
         TransformResult { code: transformed }
