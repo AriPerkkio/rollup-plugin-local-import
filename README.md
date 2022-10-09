@@ -44,29 +44,47 @@ import { localImport } from "rollup-plugin-local-import";
 
 export default defineConfig({
   // ...
-  plugins: [localImport(".js")],
+  plugins: [localImport((path) => `${path}.js`)],
 });
 ```
 
 ### Options
 
 ```ts
-function localImport(extension: string): RollupPlugin;
+function localImport(callback: Callback): RollupPlugin;
 ```
 
-- `extension`, required
+- `callback`, `(path: string) => string`, required
 
-The extension added to each identified local import.
+Callback called with each identified local import. Must return `string`.
+
+```js
+function transformLocalImports(path: string): string {
+  console.log(`Path is "${path}"`);
+  console.log(`Returning "${path}.js"`);
+
+  return `${path}.js`;
+}
+
+export default defineConfig({
+  // ...
+  plugins: [localImport(transformLocalImports)],
+});
+```
+
+```sh
+> Path is "./Header"
+> Returning "./Header.js"
+```
 
 ```diff
-// When extension is 'js'
 - export { default } from './Header';
 + export { default } from './Header.js';
 ```
 
 ## Examples
 
-With `localImport(".js")`:
+With `localImport(path => path + '.js')`:
 
 Input:
 
