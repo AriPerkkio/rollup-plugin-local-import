@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-local-import",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Rollup plugin to manipulate local import/export statements",
   "repository": "https://github.com/AriPerkkio/rollup-plugin-local-import",
   "license": "MIT",
