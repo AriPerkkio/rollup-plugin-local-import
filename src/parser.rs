@@ -28,7 +28,13 @@ impl VisitMut for Visitor {
     }
 
     fn visit_mut_named_export(&mut self, node: &mut NamedExport) {
-        let path = node.src.as_ref().unwrap().value.to_string();
+        let path = match node.src.as_ref() {
+            // E.g. "export { method } from './local-file';", src is "./local-file"
+            Some(src) => src.value.to_string(),
+
+            // E.g. "export { SomeVariableInScope };", src is None
+            None => return,
+        };
 
         if is_local_import(&path) {
             let new_path = (&self.callback)(path);
@@ -160,5 +166,23 @@ mod tests {
         let transformed = parse(source_code, add_js_extension_callback());
 
         assert_eq!(transformed.trim(), source_code);
+    }
+
+    #[test]
+    fn re_export_named_import() {
+        let source_code = "
+        import { sideEffects } from \"./some-file\";
+        sideEffects();
+        export { sideEffects };
+        ";
+
+        let transformed = parse(source_code, add_js_extension_callback());
+
+        assert_eq!(
+            transformed.trim(),
+            "import { sideEffects } from \"./some-file.js\";
+sideEffects();
+export { sideEffects };"
+        );
     }
 }

@@ -93,6 +93,24 @@ test("ImportDeclaration, side-effect", async () => {
   `);
 });
 
+test("re-export named import", async () => {
+  const output = await run(`
+    import { sideEffects } from "./some-file";
+
+    sideEffects();
+
+    export { sideEffects };
+  `);
+
+  expect(output).toMatchInlineSnapshot(`
+    "import { sideEffects } from './some-file.js';
+    export { sideEffects } from './some-file.js';
+
+    sideEffects();
+    "
+  `);
+});
+
 test("plugin has name", () => {
   const plugin = localImport(() => {});
 
