@@ -1,3 +1,10 @@
+### [1.0.1](https://github.com/AriPerkkio/rollup-plugin-local-import/compare/v1.0.0...v1.0.1) (2022-10-23)
+
+
+### Bug Fixes
+
+* handle source-less NamedExports ([a6e2d81](https://github.com/AriPerkkio/rollup-plugin-local-import/commit/a6e2d812af70858b0e744b707228057a82c7daa1)), closes [#4](https://github.com/AriPerkkio/rollup-plugin-local-import/issues/4)
+
 ## [1.0.0](https://github.com/AriPerkkio/rollup-plugin-local-import/compare/v0.1.0...v1.0.0) (2022-10-09)
 
 
