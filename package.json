@@ -30,8 +30,8 @@
     "build:debug": "napi build --platform",
     "changelog": "npx conventional-changelog-cli -i CHANGELOG.md -p conventionalcommits -s -r 0",
     "prepublishOnly": "napi prepublish -t npm",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "vitest run --reporter verbose",
+    "test:watch": "vitest --reporter verbose",
     "version": "napi version"
   },
   "devDependencies": {
