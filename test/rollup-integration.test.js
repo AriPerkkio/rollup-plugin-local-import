@@ -1,4 +1,4 @@
-import { rmSync, writeFileSync } from "fs";
+import { existsSync, rmSync, writeFileSync } from "fs";
 import { afterAll, expect, test } from "vitest";
 import { rollup } from "rollup";
 
@@ -8,8 +8,8 @@ const input = "input.js";
 const output = { file: "output.js" };
 
 afterAll(() => {
-  rmSync(input);
-  rmSync(output.file);
+  removeIfExists(input);
+  removeIfExists(output.file);
 });
 
 test("ExportAllDeclaration", async () => {
@@ -136,4 +136,8 @@ async function run(source) {
   const bundle = await build.write(output);
 
   return bundle.output[0].code;
+}
+
+function removeIfExists(filename) {
+  existsSync(filename) && rmSync(filename);
 }

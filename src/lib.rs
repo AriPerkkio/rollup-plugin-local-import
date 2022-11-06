@@ -1,4 +1,4 @@
-use napi::{Env, JsFunction, JsString, Ref};
+use napi::{Env, Error, JsFunction, JsString, Ref};
 use napi_derive::napi;
 
 mod parser;
@@ -41,8 +41,15 @@ impl Plugin {
     }
 
     #[napi]
-    pub fn build_end(&mut self, env: Env) {
-        self.callback.unref(env).unwrap();
+    pub fn build_end(&mut self, env: Env) -> Result<(), Error> {
+        if let Err(_) = self.callback.unref(env) {
+            return Err(Error::new(
+                napi::Status::GenericFailure,
+                String::from("Failed to cleanup callback. Unexpected Rollup lifecycle order."),
+            ));
+        }
+
+        Ok(())
     }
 }
 
