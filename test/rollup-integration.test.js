@@ -133,7 +133,7 @@ async function run(source) {
     ],
   });
 
-  const bundle = await build.write({ output });
+  const bundle = await build.write(output);
 
   return bundle.output[0].code;
 }
