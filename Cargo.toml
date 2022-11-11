@@ -12,11 +12,15 @@ crate-type = ["cdylib"]
 # Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
 napi = { version = "2.10.0", default-features = false, features = ["napi4"] }
 napi-derive = "2.9.1"
-swc = "0.221.2"
-swc_common = { version = "0.27.16", features = ["tty-emitter"] }
-swc_ecma_ast = "0.90.20"
-swc_ecma_visit = "0.76.10"
-swc_ecmascript = { version = "0.197.0", features = ["visit", "transforms"]}
+
+swc_core = { version = "0.26.0", features = [
+    "__base",
+    "__common",
+    "__ecma",
+    "__ecma_transforms",
+    "__visit",
+    "common_tty",
+] }
 
 [build-dependencies]
 napi-build = "2.0.1"

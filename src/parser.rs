@@ -1,15 +1,19 @@
-extern crate swc_common;
-
-use swc::{config::Options, Compiler};
-use swc_common::{
-    errors::{ColorConfig, Handler},
-    sync::Lrc,
-    FileName, SourceMap,
+use swc_core::{
+    base::{config::Options, Compiler},
+    common::{
+        errors::{ColorConfig, Handler},
+        sync::Lrc,
+        FileName, SourceMap,
+    },
+    ecma::{
+        transforms::base::pass::noop,
+        visit::{
+            as_folder,
+            swc_ecma_ast::{ExportAll, ImportDecl, NamedExport},
+            Fold, VisitMut,
+        },
+    },
 };
-
-use swc_ecma_ast::{ExportAll, ImportDecl, NamedExport};
-use swc_ecma_visit::{as_folder, Fold};
-use swc_ecmascript::{transforms::pass::noop, visit::VisitMut};
 
 type Callback = Box<dyn Fn(String) -> String>;
 
