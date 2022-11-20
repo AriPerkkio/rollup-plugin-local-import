@@ -10,12 +10,15 @@ pub struct TransformResult {
 
 #[napi]
 pub struct Plugin {
+    /// Name of the Rollup plugin https://rollupjs.org/guide/en/#name
     pub name: String,
+
     callback_reference: Ref<()>,
 }
 
 #[napi]
 impl Plugin {
+    /// Build hook: https://rollupjs.org/guide/en/#transform
     #[napi]
     pub fn transform(&self, env: Env, source_code: String) -> TransformResult {
         let callback: JsFunction = env.get_reference_value(&self.callback_reference).unwrap();
@@ -40,6 +43,7 @@ impl Plugin {
         TransformResult { code: transformed }
     }
 
+    /// Build hook: https://rollupjs.org/guide/en/#buildend
     #[napi]
     pub fn build_end(&mut self, env: Env) -> Result<(), Error> {
         if let Err(_) = self.callback_reference.unref(env) {
