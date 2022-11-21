@@ -1,11 +1,17 @@
 import { existsSync, rmSync, writeFileSync } from "fs";
-import { afterAll, expect, test } from "vitest";
+import { afterAll, afterEach, expect, test } from "vitest";
 import { rollup } from "rollup";
 
 import { localImport } from "../plugin";
 
+const cleanups = [];
+
 const input = "input.js";
 const output = { file: "output.js" };
+
+afterEach(() => {
+  cleanups.splice(0).forEach((cleanup) => cleanup());
+});
 
 afterAll(() => {
   removeIfExists(input);
@@ -113,11 +119,60 @@ test("re-export named import", async () => {
 
 test("plugin has name", () => {
   const plugin = localImport(() => {});
+  cleanups.push(plugin.buildEnd);
 
   expect(plugin).toHaveProperty("name", "local-import");
+});
 
-  // Manual cleanup
-  plugin.buildEnd();
+test("includes sourcemaps", () => {
+  const plugin = localImport((path) => {
+    return `${path}-with-some-extra-long-name-to-make-sure-sourcemaps-add-some-padding.random.extension`;
+  });
+  cleanups.push(plugin.buildEnd);
+
+  const { map } = plugin.transform(
+    `
+import SomeModule from './some-module';
+import fs from 'fs';
+
+// Wow, comments
+import AnotherModule from './another-module';
+
+function hello() {
+  return 'Hello!';
+}
+  `,
+    "test-file-123.js"
+  );
+
+  expect(JSON.parse(map)).toMatchInlineSnapshot(`
+    {
+      "mappings": "AACA,OAAOA,UAAU,MAAM,mGAAe,CAAC;AACvC,OAAOC,EAAE,MAAM,IAAI,CAAC;AAEpB,gBAAgB;AAChB,OAAOC,aAAa,MAAM,sGAAkB,CAAC;AAE7C,SAASC,KAAK,GAAG;IACf,OAAO,QAAQ,CAAC;AAClB,CAAC",
+      "names": [
+        "SomeModule",
+        "fs",
+        "AnotherModule",
+        "hello",
+      ],
+      "sources": [
+        "test-file-123.js",
+      ],
+      "sourcesContent": [
+        "
+    import SomeModule from './some-module';
+    import fs from 'fs';
+
+    // Wow, comments
+    import AnotherModule from './another-module';
+
+    function hello() {
+      return 'Hello!';
+    }
+      ",
+      ],
+      "version": 3,
+    }
+  `);
 });
 
 async function run(source) {

@@ -6,6 +6,7 @@ mod parser;
 #[napi(object)]
 pub struct TransformResult {
     pub code: String,
+    pub map: String,
 }
 
 #[napi]
@@ -20,7 +21,12 @@ pub struct Plugin {
 impl Plugin {
     /// Build hook: https://rollupjs.org/guide/en/#transform
     #[napi]
-    pub fn transform(&self, env: Env, source_code: String) -> TransformResult {
+    pub fn transform(
+        &self,
+        env: Env,
+        source_code: String,
+        filename: String,
+    ) -> Result<TransformResult, Error> {
         let callback: JsFunction = env.get_reference_value(&self.callback_reference).unwrap();
 
         let transform_paths = Box::new(move |path: String| {
@@ -37,10 +43,7 @@ impl Plugin {
             return modified.as_str().unwrap().to_string();
         });
 
-        let transformed = parser::parse(&source_code, transform_paths);
-
-        // TODO: Include source map
-        TransformResult { code: transformed }
+        parser::parse(&source_code, &filename, transform_paths)
     }
 
     /// Build hook: https://rollupjs.org/guide/en/#buildend

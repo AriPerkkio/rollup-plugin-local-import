@@ -1,5 +1,8 @@
 use swc_core::{
-    base::{config::Options, Compiler},
+    base::{
+        config::{Options, SourceMapsConfig},
+        Compiler, TransformOutput,
+    },
     common::{
         errors::{ColorConfig, Handler},
         sync::Lrc,
@@ -14,6 +17,8 @@ use swc_core::{
         },
     },
 };
+
+use crate::TransformResult;
 
 type Callback = Box<dyn Fn(String) -> String>;
 
@@ -64,10 +69,10 @@ fn visitor(callback: Callback) -> impl Fold {
     as_folder(Visitor { callback })
 }
 
-pub fn parse(code: &str, callback: Callback) -> String {
+pub fn parse(code: &str, filename: &str, callback: Callback) -> napi::Result<TransformResult> {
     let source_map: Lrc<SourceMap> = Default::default();
     let source_file =
-        source_map.new_source_file(FileName::Custom("source.js".into()), code.to_string());
+        source_map.new_source_file(FileName::Custom(filename.to_string()), code.to_string());
     let handler =
         Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(source_map.clone()));
 
@@ -77,15 +82,39 @@ pub fn parse(code: &str, callback: Callback) -> String {
         source_file,
         None,
         &handler,
-        &Options::default(),
+        &Options {
+            source_file_name: Some(filename.to_string()),
+            source_maps: Some(SourceMapsConfig::Bool(true)),
+            ..Default::default()
+        },
         |_, _| visitor(callback),
         |_, _| noop(),
     );
 
     handler.abort_if_errors();
 
-    // TODO: Include source map
-    transformed.unwrap().code
+    let TransformOutput {
+        code,
+        map: option_map,
+    } = match transformed {
+        Ok(result) => result,
+        Err(error) => {
+            return Err(napi::Error::new(
+                napi::Status::GenericFailure,
+                error.to_string(),
+            ));
+        }
+    };
+
+    match option_map {
+        Some(map) => Ok(TransformResult { code, map }),
+        None => {
+            return Err(napi::Error::new(
+                napi::Status::GenericFailure,
+                String::from("Failed to generate sourcemaps."),
+            ));
+        }
+    }
 }
 
 #[cfg(test)]
@@ -105,18 +134,22 @@ mod tests {
     fn calls_callback_with_path() {
         parse(
             "export * from \"./local-file\";",
+            "some-file.js",
             Box::new(|path: String| {
                 assert_eq!(path, "./local-file");
                 path
             }),
-        );
+        )
+        .unwrap();
     }
 
     #[test]
     fn export_all_local_file_in_same_directory() {
         let source_code = "export * from \"./local-file\";";
 
-        let transformed = parse(source_code, add_js_extension_callback());
+        let transformed = parse(source_code, "some-file.js", add_js_extension_callback())
+            .unwrap()
+            .code;
 
         assert_eq!(transformed.trim(), "export * from \"./local-file.js\";");
     }
@@ -125,7 +158,9 @@ mod tests {
     fn export_all_local_file_in_parent_directory() {
         let source_code = "export * from \"../local-file\";";
 
-        let transformed = parse(source_code, add_js_extension_callback());
+        let transformed = parse(source_code, "some-file.js", add_js_extension_callback())
+            .unwrap()
+            .code;
 
         assert_eq!(transformed.trim(), "export * from \"../local-file.js\";");
     }
@@ -134,7 +169,9 @@ mod tests {
     fn export_all_dependency() {
         let source_code = "export * from \"some-dependency\";";
 
-        let transformed = parse(source_code, add_js_extension_callback());
+        let transformed = parse(source_code, "some-file.js", add_js_extension_callback())
+            .unwrap()
+            .code;
 
         assert_eq!(transformed.trim(), source_code);
     }
@@ -143,7 +180,9 @@ mod tests {
     fn export_named_local_file_in_same_directory() {
         let source_code = "export { method } from \"./local-file\";";
 
-        let transformed = parse(source_code, add_js_extension_callback());
+        let transformed = parse(source_code, "some-file.js", add_js_extension_callback())
+            .unwrap()
+            .code;
 
         assert_eq!(
             transformed.trim(),
@@ -155,7 +194,9 @@ mod tests {
     fn export_named_local_file_in_parent_directory() {
         let source_code = "export { method } from \"../local-file\";";
 
-        let transformed = parse(source_code, add_js_extension_callback());
+        let transformed = parse(source_code, "some-file.js", add_js_extension_callback())
+            .unwrap()
+            .code;
 
         assert_eq!(
             transformed.trim(),
@@ -167,7 +208,9 @@ mod tests {
     fn export_named_dependency() {
         let source_code = "export { method } from \"some-dependency\";";
 
-        let transformed = parse(source_code, add_js_extension_callback());
+        let transformed = parse(source_code, "some-file.js", add_js_extension_callback())
+            .unwrap()
+            .code;
 
         assert_eq!(transformed.trim(), source_code);
     }
@@ -180,7 +223,9 @@ mod tests {
         export { sideEffects };
         ";
 
-        let transformed = parse(source_code, add_js_extension_callback());
+        let transformed = parse(source_code, "some-file.js", add_js_extension_callback())
+            .unwrap()
+            .code;
 
         assert_eq!(
             transformed.trim(),
