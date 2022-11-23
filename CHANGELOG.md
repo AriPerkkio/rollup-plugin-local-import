@@ -1,3 +1,13 @@
+## [1.1.0](https://github.com/AriPerkkio/rollup-plugin-local-import/compare/v1.0.1...v1.1.0) (2022-11-23)
+
+
+### Features
+
+* **error-handling:** callback cleanup failures ([698aa67](https://github.com/AriPerkkio/rollup-plugin-local-import/commit/698aa67d604836f468d19261954ee950399c3dba))
+* **error-handling:** callback reference failures ([2093f3d](https://github.com/AriPerkkio/rollup-plugin-local-import/commit/2093f3d3e5d282eeb75f215b1475d93b8705bff8))
+* output sourcemaps ([5d26df0](https://github.com/AriPerkkio/rollup-plugin-local-import/commit/5d26df0adf75cbf1859add8b94dd1a2c6437140f))
+* switch to swc_core ([441bece](https://github.com/AriPerkkio/rollup-plugin-local-import/commit/441bece485163fa522d2e9bf942e30d6239a8e57))
+
 ### [1.0.1](https://github.com/AriPerkkio/rollup-plugin-local-import/compare/v1.0.0...v1.0.1) (2022-10-23)
 
 
