@@ -1,4 +1,4 @@
-use napi::{Env, Error, JsFunction, JsString, Ref};
+use napi::{Env, Error, JsError, JsFunction, JsString, JsUnknown, Ref};
 use napi_derive::napi;
 
 mod parser;
@@ -32,15 +32,18 @@ impl Plugin {
         let transform_paths = Box::new(move |path: String| {
             let args: [JsString; 1] = [env.create_string(&path).unwrap()];
 
-            let modified = callback
-                .call(None, &args)
-                .unwrap()
-                .coerce_to_string()
-                .unwrap()
-                .into_utf8()
-                .unwrap();
+            match callback.call(None, &args) {
+                Ok(new_path) => Ok(to_string(new_path)),
+                Err(e) => {
+                    // Capture the error thrown from JS side
+                    let error_from_callback = to_string(JsError::from(e).into_unknown(env));
 
-            return modified.as_str().unwrap().to_string();
+                    return Err(format!(
+                        "Callback threw error {:?} when called with {:?}",
+                        &error_from_callback, &path
+                    ));
+                }
+            }
         });
 
         parser::parse(&source_code, &filename, transform_paths)
@@ -76,4 +79,15 @@ pub fn local_import(env: Env, callback: JsFunction) -> Result<Plugin, Error> {
         name: String::from("local-import"),
         callback_reference,
     })
+}
+
+fn to_string(js_unknown: JsUnknown) -> String {
+    js_unknown
+        .coerce_to_string()
+        .unwrap()
+        .into_utf8()
+        .unwrap()
+        .as_str()
+        .unwrap()
+        .to_string()
 }

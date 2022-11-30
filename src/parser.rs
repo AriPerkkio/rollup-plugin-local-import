@@ -20,10 +20,11 @@ use swc_core::{
 
 use crate::TransformResult;
 
-type Callback = Box<dyn Fn(String) -> String>;
+type Callback = Box<dyn Fn(String) -> Result<String, String>>;
 
 struct Visitor {
     callback: Callback,
+    errors: Vec<String>,
 }
 
 impl VisitMut for Visitor {
@@ -31,8 +32,10 @@ impl VisitMut for Visitor {
         let path = node.src.value.to_string();
 
         if is_local_import(&path) {
-            let new_path = (&self.callback)(path);
-            node.src.value = new_path.into()
+            match (&self.callback)(path) {
+                Ok(new_path) => node.src.value = new_path.into(),
+                Err(error) => self.errors.push(error),
+            }
         }
     }
 
@@ -46,8 +49,10 @@ impl VisitMut for Visitor {
         };
 
         if is_local_import(&path) {
-            let new_path = (&self.callback)(path);
-            node.src.as_mut().unwrap().value = new_path.into()
+            match (&self.callback)(path) {
+                Ok(new_path) => node.src.as_mut().unwrap().value = new_path.into(),
+                Err(error) => self.errors.push(error),
+            };
         }
     }
 
@@ -55,8 +60,10 @@ impl VisitMut for Visitor {
         let path = node.src.value.to_string();
 
         if is_local_import(&path) {
-            let new_path = (&self.callback)(path);
-            node.src.value = new_path.into()
+            match (&self.callback)(path) {
+                Ok(new_path) => node.src.value = new_path.into(),
+                Err(error) => self.errors.push(error),
+            };
         }
     }
 }
@@ -65,8 +72,8 @@ fn is_local_import(path: &str) -> bool {
     return path.starts_with("./") || path.starts_with("../");
 }
 
-fn visitor(callback: Callback) -> impl Fold {
-    as_folder(Visitor { callback })
+fn as_visitor(visitor: &mut Visitor) -> impl Fold + '_ {
+    as_folder(visitor)
 }
 
 pub fn parse(code: &str, filename: &str, callback: Callback) -> napi::Result<TransformResult> {
@@ -78,6 +85,11 @@ pub fn parse(code: &str, filename: &str, callback: Callback) -> napi::Result<Tra
 
     let compiler = Compiler::new(source_map);
 
+    let mut visitor = Visitor {
+        callback,
+        errors: vec![],
+    };
+
     let transformed = compiler.process_js_with_custom_pass(
         source_file,
         None,
@@ -87,9 +99,20 @@ pub fn parse(code: &str, filename: &str, callback: Callback) -> napi::Result<Tra
             source_maps: Some(SourceMapsConfig::Bool(true)),
             ..Default::default()
         },
-        |_, _| visitor(callback),
+        |_, _| as_visitor(&mut visitor),
         |_, _| noop(),
     );
+
+    if visitor.errors.len() > 0 {
+        return Err(napi::Error::new(
+            napi::Status::GenericFailure,
+            format!(
+                "Run into {:?} error(s): [{:?}].",
+                visitor.errors.len(),
+                visitor.errors.join(",")
+            ),
+        ));
+    }
 
     handler.abort_if_errors();
 
@@ -126,7 +149,7 @@ mod tests {
             let mut new_path: String = path.to_string();
             new_path.push_str(".js");
 
-            new_path
+            Ok(new_path)
         })
     }
 
@@ -137,7 +160,7 @@ mod tests {
             "some-file.js",
             Box::new(|path: String| {
                 assert_eq!(path, "./local-file");
-                path
+                Ok(path)
             }),
         )
         .unwrap();
