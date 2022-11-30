@@ -9,7 +9,7 @@ export interface TransformResult {
 }
 export function localImport(callback: (path: string) => string): Plugin
 export class Plugin {
-  /** Public plugin properties https://rollupjs.org/guide/en/#properties */
+  /** Name of the Rollup plugin https://rollupjs.org/guide/en/#name */
   name: string
   /** Build hook: https://rollupjs.org/guide/en/#transform */
   transform(sourceCode: string, filename: string): TransformResult
