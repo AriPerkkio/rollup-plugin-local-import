@@ -1,3 +1,10 @@
+## [1.2.0](https://github.com/AriPerkkio/rollup-plugin-local-import/compare/v1.1.0...v1.2.0) (2022-12-01)
+
+
+### Features
+
+* **error-handling:** handle errors thrown by callback argument ([9ca1390](https://github.com/AriPerkkio/rollup-plugin-local-import/commit/9ca1390d3d555026eb0acdc61d5a5a7c0c07d936))
+
 ## [1.1.0](https://github.com/AriPerkkio/rollup-plugin-local-import/compare/v1.0.1...v1.1.0) (2022-11-23)
 
 
