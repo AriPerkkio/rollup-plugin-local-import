@@ -46,7 +46,10 @@ impl Plugin {
             }
         });
 
-        parser::parse(&source_code, &filename, transform_paths)
+        match parser::parse(&source_code, &filename, transform_paths) {
+            Ok(result) => Ok(result),
+            Err(error) => Err(Error::new(napi::Status::GenericFailure, error)),
+        }
     }
 
     /// Build hook: https://rollupjs.org/guide/en/#buildend

@@ -76,7 +76,7 @@ fn as_visitor(visitor: &mut Visitor) -> impl Fold + '_ {
     as_folder(visitor)
 }
 
-pub fn parse(code: &str, filename: &str, callback: Callback) -> napi::Result<TransformResult> {
+pub fn parse(code: &str, filename: &str, callback: Callback) -> Result<TransformResult, String> {
     let source_map: Lrc<SourceMap> = Default::default();
     let source_file =
         source_map.new_source_file(FileName::Custom(filename.to_string()), code.to_string());
@@ -104,13 +104,10 @@ pub fn parse(code: &str, filename: &str, callback: Callback) -> napi::Result<Tra
     );
 
     if visitor.errors.len() > 0 {
-        return Err(napi::Error::new(
-            napi::Status::GenericFailure,
-            format!(
-                "Run into {:?} error(s): [{:?}].",
-                visitor.errors.len(),
-                visitor.errors.join(",")
-            ),
+        return Err(format!(
+            "Run into {:?} error(s): [{:?}].",
+            visitor.errors.len(),
+            visitor.errors.join(",")
         ));
     }
 
@@ -122,21 +119,13 @@ pub fn parse(code: &str, filename: &str, callback: Callback) -> napi::Result<Tra
     } = match transformed {
         Ok(result) => result,
         Err(error) => {
-            return Err(napi::Error::new(
-                napi::Status::GenericFailure,
-                error.to_string(),
-            ));
+            return Err(error.to_string());
         }
     };
 
     match option_map {
         Some(map) => Ok(TransformResult { code, map }),
-        None => {
-            return Err(napi::Error::new(
-                napi::Status::GenericFailure,
-                String::from("Failed to generate sourcemaps."),
-            ));
-        }
+        None => Err("Failed to generate sourcemaps.".to_string()),
     }
 }
 
