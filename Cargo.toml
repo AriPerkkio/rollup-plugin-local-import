@@ -13,7 +13,7 @@ crate-type = ["cdylib"]
 napi = { version = "2.10.1", default-features = false, features = ["napi4"] }
 napi-derive = "2.9.1"
 
-swc_core = { version = "0.26.0", features = [
+swc_core = { version = "0.45.1", features = [
     "__base",
     "__common",
     "__ecma",

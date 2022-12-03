@@ -147,7 +147,7 @@ function hello() {
 
   expect(JSON.parse(map)).toMatchInlineSnapshot(`
     {
-      "mappings": "AACA,OAAOA,UAAU,MAAM,mGAAe,CAAC;AACvC,OAAOC,EAAE,MAAM,IAAI,CAAC;AAEpB,gBAAgB;AAChB,OAAOC,aAAa,MAAM,sGAAkB,CAAC;AAE7C,SAASC,KAAK,GAAG;IACf,OAAO,QAAQ,CAAC;AAClB,CAAC",
+      "mappings": "AACA,OAAOA,gBAAgB,oGAAgB;AACvC,OAAOC,QAAQ,KAAK;AAEpB,gBAAgB;AAChB,OAAOC,mBAAmB,uGAAmB;AAE7C,SAASC,QAAQ;IACf,OAAO;AACT",
       "names": [
         "SomeModule",
         "fs",
