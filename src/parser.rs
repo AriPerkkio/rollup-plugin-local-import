@@ -6,7 +6,7 @@ use swc_core::{
     common::{
         errors::{ColorConfig, Handler},
         sync::Lrc,
-        FileName, SourceMap,
+        FileName, SourceMap, GLOBALS,
     },
     ecma::{
         transforms::base::pass::noop,
@@ -90,18 +90,21 @@ pub fn parse(code: &str, filename: &str, callback: Callback) -> Result<Transform
         errors: vec![],
     };
 
-    let transformed = compiler.process_js_with_custom_pass(
-        source_file,
-        None,
-        &handler,
-        &Options {
-            source_file_name: Some(filename.to_string()),
-            source_maps: Some(SourceMapsConfig::Bool(true)),
-            ..Default::default()
-        },
-        |_, _| as_visitor(&mut visitor),
-        |_, _| noop(),
-    );
+    let transformed = GLOBALS.set(&Default::default(), || {
+        compiler.process_js_with_custom_pass(
+            source_file,
+            None,
+            &handler,
+            &Options {
+                source_file_name: Some(filename.to_string()),
+                source_maps: Some(SourceMapsConfig::Bool(true)),
+                ..Default::default()
+            },
+            Default::default(),
+            |_| as_visitor(&mut visitor),
+            |_| noop(),
+        )
+    });
 
     if visitor.errors.len() > 0 {
         return Err(format!(
