@@ -1,0 +1,24 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["schedule:weekly"],
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": ["npm"],
+      "groupName": "all non-major npm dependencies",
+      "groupSlug": "all-minor-patch-npm"
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": ["cargo"],
+      "groupName": "all non-major cargo dependencies",
+      "groupSlug": "all-minor-patch-cargo"
+    },
+    {
+      "depTypeList": ["engines"],
+      "enabled": false
+    }
+  ]
+}
