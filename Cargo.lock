@@ -845,9 +845,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "2.10.3"
+version = "2.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a967e17e9ba4e015a7bf9b92f90aa8dc321c6d913f6a6d2afd5b66a8ab36fc81"
+checksum = "838b5b414a008e75b97edb3c3e6f189034af789a0608686299b149d3b0e66c39"
 dependencies = [
  "bitflags",
  "ctor",
@@ -1679,9 +1679,9 @@ dependencies = [
 
 [[package]]
 name = "swc_core"
-version = "0.51.1"
+version = "0.51.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24c06001762e4a8ace5d30375cb4113fa7430f2b5fb2f506fac44ed9aac08cc5"
+checksum = "5cabfde9a1a3a9d5a826f35dac62532a33328d34d7597aecdecb674f3fe6c811"
 dependencies = [
  "swc",
  "swc_common",
