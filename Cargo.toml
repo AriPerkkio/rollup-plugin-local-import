@@ -10,10 +10,10 @@ crate-type = ["cdylib"]
 
 [dependencies]
 # Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
-napi = { version = "2.10.13", default-features = false, features = ["napi4"] }
-napi-derive = "2.10.0"
+napi = { version = "2.10.15", default-features = false, features = ["napi4"] }
+napi-derive = "2.10.1"
 
-swc_core = { version = "0.59.7", features = [
+swc_core = { version = "0.59.13", features = [
     "__base",
     "__common",
     "__ecma",
