@@ -35,8 +35,8 @@
     "version": "napi version"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^2.14.6",
-    "rollup": "^3.14.0",
-    "vitest": "^0.28.4"
+    "@napi-rs/cli": "^2.14.8",
+    "rollup": "^3.17.3",
+    "vitest": "^0.29.1"
   }
 }
