@@ -37,6 +37,9 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.14.8",
     "rollup": "^3.17.3",
-    "vitest": "^0.29.1"
+    "vitest": "^0.28.5"
+  },
+  "dependencies": {
+    "rollup-plugin-local-import": "^1.2.0"
   }
 }
