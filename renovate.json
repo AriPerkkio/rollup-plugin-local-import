@@ -17,6 +17,11 @@
       "groupSlug": "all-minor-patch-cargo"
     },
     {
+      "groupName": "swc_core changes",
+      "matchPackageNames": ["swc_core"],
+      "description": "SWC releases often break builds"
+    },
+    {
       "depTypeList": ["engines"],
       "enabled": false
     }
