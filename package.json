@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@napi-rs/cli": "^2.15.2",
-    "rollup": "^3.21.7",
-    "vitest": "^0.31.0"
+    "rollup": "^3.22.1",
+    "vitest": "^0.31.1"
   }
 }
