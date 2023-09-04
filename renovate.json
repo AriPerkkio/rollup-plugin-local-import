@@ -19,7 +19,8 @@
     {
       "groupName": "swc_core changes",
       "matchPackageNames": ["swc_core"],
-      "description": "SWC releases often break builds"
+      "description": "SWC doesnt work on stable Rust: https://github.com/swc-project/swc/issues/7039#issuecomment-1534777604",
+      "enabled": false
     },
     {
       "depTypeList": ["engines"],
