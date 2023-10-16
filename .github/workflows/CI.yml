@@ -56,7 +56,7 @@ jobs:
               export CFLAGS="-isysroot $SYSROOT -isystem $SYSROOT";
               yarn build --target aarch64-apple-darwin
               strip -x *.node
-    name: stable - ${{ matrix.settings.target }} - node@16
+    name: stable - ${{ matrix.settings.target }} - node@18
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
         uses: actions/setup-node@v3
         if: ${{ !matrix.settings.docker }}
         with:
-          node-version: 16
+          node-version: 18
           check-latest: true
           cache: yarn
       - name: Install
@@ -89,7 +89,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .yarn/cache
-          key: npm-cache-build-${{ matrix.settings.target }}-node@16
+          key: npm-cache-build-${{ matrix.settings.target }}-node@18
       - name: Setup toolchain
         run: ${{ matrix.settings.setup }}
         if: ${{ matrix.settings.setup }}
@@ -104,7 +104,7 @@ jobs:
         uses: actions/setup-node@v3
         if: matrix.settings.target == 'i686-pc-windows-msvc'
         with:
-          node-version: 16
+          node-version: 18
           check-latest: true
           cache: yarn
           architecture: x86
@@ -136,8 +136,6 @@ jobs:
           - host: windows-latest
             target: x86_64-pc-windows-msvc
         node:
-          - "14"
-          - "16"
           - "18"
     runs-on: ${{ matrix.settings.host }}
     steps:
@@ -173,8 +171,6 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - "14"
-          - "16"
           - "18"
     runs-on: ubuntu-latest
     steps:
@@ -210,8 +206,6 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - "14"
-          - "16"
           - "18"
     runs-on: ubuntu-latest
     steps:
