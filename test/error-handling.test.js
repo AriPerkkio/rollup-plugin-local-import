@@ -15,19 +15,19 @@ test("throws useful error message when callback cleanup fails", () => {
   plugin.buildEnd();
 
   expect(() => plugin.buildEnd()).toThrowErrorMatchingInlineSnapshot(
-    '"Failed to cleanup callback. Unexpected Rollup lifecycle order."'
+    `[Error: Failed to cleanup callback. Unexpected Rollup lifecycle order.]`
   );
 });
 
 test("throws useful error message when callback is missing", () => {
   expect(() => localImport()).toThrowErrorMatchingInlineSnapshot(
-    '"Failed to reference callback. Did you pass function to `localImport(callback)`?"'
+    `[Error: Failed to reference callback. Did you pass function to \`localImport(callback)\`?]`
   );
 });
 
 test("throws useful error message when callback is not function", () => {
   expect(() => localImport(123)).toThrowErrorMatchingInlineSnapshot(
-    '"Failed to reference callback. Did you pass function to `localImport(callback)`?"'
+    `[Error: Failed to reference callback. Did you pass function to \`localImport(callback)\`?]`
   );
 });
 
@@ -39,7 +39,7 @@ test("throws useful error message when callback throws", () => {
 
   expect(() =>
     plugin.transform('import A from "./some-file";', "file.js")
-  ).toThrowErrorMatchingInlineSnapshot('"Run into 1 error(s): [\\"Callback threw error \\\\\\"Error: Throwing some error from callback\\\\\\" when called with \\\\\\"./some-file\\\\\\"\\"]."');
+  ).toThrowErrorMatchingInlineSnapshot(`[Error: Run into 1 error(s): ["Callback threw error \\"Error: Throwing some error from callback\\" when called with \\"./some-file\\""].]`);
 });
 
 test("includes all errors thrown by callback in error message", () => {
@@ -59,5 +59,5 @@ test("includes all errors thrown by callback in error message", () => {
     `,
       "file.js"
     )
-  ).toThrowErrorMatchingInlineSnapshot('"Run into 5 error(s): [\\"Callback threw error \\\\\\"Error: Throwing some error from callback\\\\\\" when called with \\\\\\"./local-file-1\\\\\\",Callback threw error \\\\\\"Error: Throwing some error from callback\\\\\\" when called with \\\\\\"./local-file-2\\\\\\",Callback threw error \\\\\\"Error: Throwing some error from callback\\\\\\" when called with \\\\\\"./local-file-3\\\\\\",Callback threw error \\\\\\"Error: Throwing some error from callback\\\\\\" when called with \\\\\\"./local-file-4\\\\\\",Callback threw error \\\\\\"Error: Throwing some error from callback\\\\\\" when called with \\\\\\"./local-file-5\\\\\\"\\"]."');
+  ).toThrowErrorMatchingInlineSnapshot(`[Error: Run into 5 error(s): ["Callback threw error \\"Error: Throwing some error from callback\\" when called with \\"./local-file-1\\",Callback threw error \\"Error: Throwing some error from callback\\" when called with \\"./local-file-2\\",Callback threw error \\"Error: Throwing some error from callback\\" when called with \\"./local-file-3\\",Callback threw error \\"Error: Throwing some error from callback\\" when called with \\"./local-file-4\\",Callback threw error \\"Error: Throwing some error from callback\\" when called with \\"./local-file-5\\""].]`);
 });
